@@ -1,0 +1,143 @@
+/* Animated background elements */
+.leaf-bg-1,
+.leaf-bg-2,
+.leaf-bg-3 {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background-image: url('https://images.unsplash.com/photo-1564114465-58883185f2ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80');
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.1;
+  z-index: 0;
+  animation-duration: 15s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.leaf-bg-1 {
+  top: 10%;
+  left: -5%;
+  animation-name: float-1;
+}
+
+.leaf-bg-2 {
+  top: 40%;
+  right: -5%;
+  transform: rotate(180deg);
+  animation-name: float-2;
+}
+
+.leaf-bg-3 {
+  bottom: 10%;
+  left: 30%;
+  transform: rotate(45deg);
+  animation-name: float-3;
+}
+
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(20px, 20px) rotate(5deg); }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0) rotate(180deg); }
+  50% { transform: translate(-20px, 20px) rotate(175deg); }
+}
+
+@keyframes float-3 {
+  0%, 100% { transform: translate(0, 0) rotate(45deg); }
+  50% { transform: translate(20px, -20px) rotate(50deg); }
+}
+
+/* Card animations */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Button animations */
+.btn-animate {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-animate:after {
+  content: '';
+  position: absolute;
+  width: 0%;
+  height: 100%;
+  top: 0;
+  left: -10%;
+  transform: skewX(-15deg);
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.4s ease;
+}
+
+.btn-animate:hover:after {
+  width: 120%;
+  left: -10%;
+}
+
+/* Hero slider animation */
+.slide-in {
+  animation: slideIn 0.8s ease forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered animation for multiple elements */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+
+/* Hide scrollbar for feedback cards */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Stat card animations */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-count-up {
+  animation: countUp 1s ease-out forwards;
+}
+
+/* Progress bar animation */
+@keyframes progressFill {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.animate-progress {
+  animation: progressFill 1.5s ease-out forwards;
+}
