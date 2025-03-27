@@ -39,7 +39,7 @@ const TrackProgressPage: React.FC = () => {
           }
 
           const data = {
-            api_key: "QIfRYtShJ9NUbwpR6kuniLEzuFnEsycCDYVCq35EePKcXiWTxb", // Move this to an env variable in production!
+            api_key: "rDQ1vAEtJzVEbZv95FFNFkWYcHxZqAAY0PXRQuyo11pZHkZEez",
             images: [base64Image],
             modifiers: ["crops_fast", "similar_images"],
             language: "en",
@@ -69,8 +69,23 @@ const TrackProgressPage: React.FC = () => {
                 topDisease.probability * 100
               ).toFixed(2)}% confidence)`
             );
-            setDiseaseDetails(topDisease);
-            console.log("Disease details:", topDisease);
+            setDiseaseDetails({
+              ...topDisease,
+              futureCare: [
+                "Regular monitoring of symptoms",
+                "Maintain optimal watering schedule",
+                "Ensure proper light conditions",
+                "Apply recommended treatments",
+                "Monitor surrounding plants",
+              ],
+              preventiveMeasures: [
+                "Maintain good air circulation",
+                "Avoid overwatering",
+                "Regular cleaning of plant area",
+                "Proper spacing between plants",
+                "Regular inspection for early detection",
+              ],
+            });
           } else if (response.data?.suggestions?.length > 0) {
             const suggestion = response.data.suggestions[0];
             setPrediction(
@@ -82,9 +97,42 @@ const TrackProgressPage: React.FC = () => {
               name: suggestion.name,
               description: suggestion.description,
               treatment: suggestion.treatment,
+              futureCare: [
+                "Regular monitoring",
+                "Maintain optimal growing conditions",
+                "Follow standard care practices",
+                "Document any changes",
+                "Seasonal maintenance",
+              ],
+              preventiveMeasures: [
+                "Regular health checks",
+                "Proper watering routine",
+                "Adequate sunlight exposure",
+                "Clean growing environment",
+                "Balanced nutrition",
+              ],
             });
           } else {
             setPrediction("No diseases detected. Your plant appears healthy!");
+            setDiseaseDetails({
+              name: "Healthy Plant",
+              description: "Your plant shows no signs of disease or stress.",
+              treatment: "Continue with regular maintenance and care.",
+              futureCare: [
+                "Maintain current care routine",
+                "Regular watering as needed",
+                "Proper sunlight exposure",
+                "Seasonal fertilization",
+                "Regular pruning when needed",
+              ],
+              preventiveMeasures: [
+                "Monitor for any changes",
+                "Maintain clean environment",
+                "Proper ventilation",
+                "Regular soil health checks",
+                "Balanced nutrition",
+              ],
+            });
           }
         };
       } catch (error: any) {
@@ -124,12 +172,19 @@ const TrackProgressPage: React.FC = () => {
             <label className="block mb-2 text-sm font-medium text-gray-700">
               Upload plant image
             </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-green-50 focus:outline-none p-2.5"
-            />
+            <div className="mt-2 flex justify-center rounded-lg border-2 border-dashed border-green-300 px-6 py-10">
+              <div className="text-center">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="block w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                />
+                <p className="mt-2 text-xs text-gray-500">
+                  PNG, JPG up to 10MB
+                </p>
+              </div>
+            </div>
           </div>
 
           {image && (
@@ -137,7 +192,7 @@ const TrackProgressPage: React.FC = () => {
               <img
                 src={URL.createObjectURL(image)}
                 alt="Plant"
-                className="max-w-md mx-auto h-auto rounded-md shadow-lg"
+                className="max-w-md mx-auto h-auto rounded-lg shadow-lg object-contain"
               />
             </div>
           )}
@@ -145,56 +200,160 @@ const TrackProgressPage: React.FC = () => {
           <div className="flex justify-center mb-6">
             <button
               onClick={predictPlantHealth}
-              className="w-full md:w-1/3 py-3 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition-colors disabled:bg-green-400"
+              className="w-full md:w-1/3 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed shadow-md"
               disabled={!image || loading}
             >
-              {loading ? "Processing..." : "Check Plant Health"}
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Processing...
+                </span>
+              ) : (
+                "Check Plant Health"
+              )}
             </button>
           </div>
 
-          {prediction && (
+          {prediction && diseaseDetails && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="mt-8 p-6 bg-white rounded-lg shadow-md text-left"
+              className="mt-8 p-6 bg-white rounded-xl shadow-lg text-left"
               id="report-section"
             >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-green-800">
-                  Plant Health Report
-                </h2>
+              <div className="flex justify-between items-center mb-6 border-b pb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-green-800">
+                    Plant Health Report
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Report generated on: {reportDate}
+                  </p>
+                </div>
                 <button
                   onClick={generatePDF}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-md"
                 >
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
                   Save Report
                 </button>
               </div>
 
-              <div className="border-b border-gray-200 pb-4 mb-4">
-                <p className="text-sm text-gray-500">
-                  Report generated on: {reportDate}
-                </p>
-                <p className="text-lg font-medium">{prediction}</p>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <div className="bg-green-50 rounded-lg p-6">
+                    <h3 className="text-xl font-semibold text-green-800 mb-4">
+                      Diagnosis
+                    </h3>
+                    <div className="space-y-4">
+                      <p className="text-lg font-medium text-gray-800">
+                        {prediction}
+                      </p>
+                      <p className="text-gray-700">
+                        {diseaseDetails.description}
+                      </p>
+                    </div>
+                  </div>
 
-              {diseaseDetails && (
-                <div>
-                  <h3 className="text-xl font-semibold text-green-700 mb-2">
-                    Disease Details
-                  </h3>
-                  <p className="text-gray-700">
-                    <strong>Name:</strong> {diseaseDetails.name}
-                  </p>
-                  <p className="text-gray-700">
-                    <strong>Description:</strong> {diseaseDetails.description}
-                  </p>
-                  <p className="text-gray-700">
-                    <strong>Treatment:</strong> {diseaseDetails.treatment}
-                  </p>
+                  <div className="bg-green-50 rounded-lg p-6">
+                    <h3 className="text-xl font-semibold text-green-800 mb-4">
+                      Treatment Plan
+                    </h3>
+                    <p className="text-gray-700">{diseaseDetails.treatment}</p>
+                  </div>
                 </div>
-              )}
+
+                <div className="space-y-6">
+                  <div className="bg-green-50 rounded-lg p-6">
+                    <h3 className="text-xl font-semibold text-green-800 mb-4">
+                      Future Care
+                    </h3>
+                    <ul className="space-y-2">
+                      {diseaseDetails.futureCare.map(
+                        (care: string, index: number) => (
+                          <li key={index} className="flex items-start">
+                            <svg
+                              className="w-5 h-5 text-green-600 mr-2 mt-0.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            <span className="text-gray-700">{care}</span>
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+
+                  <div className="bg-green-50 rounded-lg p-6">
+                    <h3 className="text-xl font-semibold text-green-800 mb-4">
+                      Preventive Measures
+                    </h3>
+                    <ul className="space-y-2">
+                      {diseaseDetails.preventiveMeasures.map(
+                        (measure: string, index: number) => (
+                          <li key={index} className="flex items-start">
+                            <svg
+                              className="w-5 h-5 text-green-600 mr-2 mt-0.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            <span className="text-gray-700">{measure}</span>
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           )}
         </motion.div>
